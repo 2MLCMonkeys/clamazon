@@ -1,0 +1,26 @@
+{
+  "name": "clamazon",
+  "version": "1.0.0",
+  "description": "Class project amazon example with MySQL",
+  "main": "clamazonCustomer.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/2MLCMonkeys/clamazon.git"
+  },
+  "keywords": [
+    "clamazonCustomer"
+  ],
+  "author": "2mlcmonkeys",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/2MLCMonkeys/clamazon/issues"
+  },
+  "homepage": "https://github.com/2MLCMonkeys/clamazon#readme",
+  "dependencies": {
+    "inquirer": "^6.5.0",
+    "mysql": "^2.17.1"
+  }
+}

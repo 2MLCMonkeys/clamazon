@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/2MLCMonkeys/clamazon#readme",
   "dependencies": {
+    "colors": "^1.3.3",
     "inquirer": "^6.5.0",
     "mysql": "^2.17.1"
   }

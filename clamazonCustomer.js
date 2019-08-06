@@ -83,7 +83,7 @@ function purchaseProduct(input) {
                                 }],
                                 function (error) {
                                     if (error) throw err;
-                                    console.log(colors.magenta("Purchased successfully, your purchase cost: ") +colors.green( +"$"+ cost));
+                                    console.log(colors.magenta("Purchased successfully, your purchase cost: ") +colors.green("$" + cost));
                                     connection.end();
                                 })
                         }

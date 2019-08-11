@@ -51,7 +51,7 @@ function runInquirer() {
                 addProduct();
             }
             else if (input === "Quit"){
-                connection.end;
+                connection.end();
             }
             else if (!input) {
                 console.log("Please enter an ID");

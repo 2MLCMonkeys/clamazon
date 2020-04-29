@@ -24,6 +24,7 @@ var connection = mySQL.createConnection({
 // INTIAL DATABASE CONNECTION //
 connection.connect(function (err) {
     if (err) throw err;
+
     // STARTS INQUIRER //
     runInquirer();
 });
@@ -33,6 +34,7 @@ connection.connect(function (err) {
 // INQUIER //
 function runInquirer() {
     inquirer
+
         // SELECTION FOR MANAGER //
         .prompt([{
             name: "menu",
@@ -40,6 +42,7 @@ function runInquirer() {
             message: "What would you like to do?:",
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "Quit"]
         }
+
             // SENDS SELECTION TO CORRECT FUNCTION //
         ]).then(function (res) {
             console.log(colors.grey("----------------------------------------------------------------------"));
@@ -70,6 +73,7 @@ function runInquirer() {
 // VIEWS ALL INVENTORY //
 function viewProducts() {
     connection.query("SELECT * FROM products",
+
         // CREATES TABLE FOR PRODUCTS //
         function start(err, res, fields) {
             if (err) throw err;
@@ -81,10 +85,12 @@ function viewProducts() {
                     , 'right': '║', 'right-mid': '╢', 'middle': '│'
                 }
             });
+
             // SPECIFIES WHERE DATA FROM DATABASE IS PLACED IN TABLE //
             table.push(
                 [colors.cyan('Item ID#'), colors.cyan('Product Name'), colors.cyan('Department'), colors.cyan('Price'), colors.cyan("Stock Quantity")]
             );
+
             // ITERATES THROUGH ALL ITEMS AND FILLS TABLE WITH ALL RELEVANT INFORMATION FROM DATABASE //
             for (var i = 0; i < res.length; i++) {
 
@@ -94,14 +100,18 @@ function viewProducts() {
             }
             console.log(table.toString());
             console.log(colors.grey("----------------------------------------------------------------------"));
+
             // PROMPTS WITH MANAGER SELECTION //
             runInquirer();
         })
 };
 
+// CHECK INVENTORY FUNCTION //
 function checkInventory() {
     connection.query("SELECT * FROM products WHERE Stock_Quantity <= 5", function start(err, res, fields) {
         if (err) throw err;
+
+        // CREATES TABLE //
         var table = new Table({
             chars: {
                 'top': '═', 'top-mid': '╤', 'top-left': '╔', 'top-right': '╗'
@@ -110,10 +120,13 @@ function checkInventory() {
                 , 'right': '║', 'right-mid': '╢', 'middle': '│'
             }
         });
+
+        // SPECIFIES WHERE DATA FROM DATABASE IS PLACED IN TABLE //
         table.push(
             [colors.cyan('Item ID#'), colors.cyan('Product Name'), colors.cyan('Department'), colors.cyan('Price'), colors.cyan('Stock Quantity')]
         );
-
+        
+        // ITERATES THROUGH ALL ITEMS AND FILLS TABLE WITH ALL RELEVANT INFORMATION FROM DATABASE IF INVENTORY IS LESS THAN 5 IT WILL BE DISPLAYED ON TABLE//
         for (var i = 0; i < res.length; i++) {
             table.push(
                 [colors.cyan(res[i].Item_ID), res[i].Product_Name, res[i].Department_Name, '$' + res[i].Purchase_Price, res[i].Stock_Quantity]
@@ -121,16 +134,23 @@ function checkInventory() {
         }
         console.log(table.toString());
         console.log(colors.grey("----------------------------------------------------------------------"));
+
+        // PROMPTS WITH MANAGER SELECTION //
         runInquirer();
 
     });
 
 };
 
+// ADD INVENTORY //
 function addInventory() {
     connection.query("SELECT * FROM products", function start(err, res, fields) {
         if (err) throw err;
+
+        // INQUIRER PROMPT FOR ADD INVENTORY //
         inquirer
+
+            // WHICH CURRENT PRODUCT BEING ADDED //
             .prompt([{
                 name: "id",
                 type: "list",
@@ -143,6 +163,8 @@ function addInventory() {
                     return choiceArray;
                 }
             },
+
+            // HOW MANY OF PRODUCT BEING ADDED //
             {
                 name: "amount",
                 type: "input",
@@ -156,13 +178,15 @@ function addInventory() {
                     }
                 }
 
-
+                // UPDATES DATABASE WITH NEW PRODUCT AMOUNT //
                 connection.query(
                     "UPDATE products SET ? WHERE ?", [{ Stock_Quantity: parseInt(chosenProduct.Stock_Quantity) + parseInt(answer.amount) }, { Product_Name: chosenProduct.Product_Name }],
                     function (err) {
                         if (err) throw err;
                         console.log(colors.magenta("Added " + answer.amount + " to " + answer.id + " inventory"));
                         console.log(colors.grey("----------------------------------------------------------------------"));
+
+                        // PROMPTS MANAGER SELECTION //
                         runInquirer();
                     }
                 );
@@ -170,23 +194,32 @@ function addInventory() {
     });
 };
 
+// ADDING NEW PRODUCT TO DATABASE //
 function addProduct() {
     inquirer
+
+        // NAME OF NEW PRODUCT //
         .prompt([{
             name: "product",
             type: "input",
             message: "What is the name of the new product being added?"
         },
+
+        // WHICH CURRENT DEPARTMENT NEW PRODUCT BELONGS TO //
         {
             name: "department",
             type: "list",
             message: "Which department would you like to add your product to?",
             choices: ["Decor", "Baby", "Home and Garden", "Beauty and Health", "Clothing", "Pets", "Electronics"]
         },
+
+        // PRODUCT INVENTORY TO BE ADDED //
         {
             name: "amount",
             type: "input",
             message: "How many products are you adding to the inventory?",
+            
+            // VALIDATES ITS A TRUE AMOUNT //
             validate: function (amount) {
                 if (isNaN(amount) === false) {
                     return true;
@@ -194,10 +227,14 @@ function addProduct() {
                 return false;
             }
         },
+
+        // COST OF NEW PRODUCT //
         {
             name: "price",
             type: "input",
             message: "What is the cost of the new inventory?",
+
+            // VALIDATES ITS A TRUE AMOUNT //
             validate: function (price) {
                 if (isNaN(price) === false) {
                     return true;
@@ -205,12 +242,15 @@ function addProduct() {
                 return false;
             }
         }
+
+        // CREATES OBJECT FROM INQUIERER TO BE PLACED IN DATABASE //
         ]).then(function (answer) {
             let stock = answer.amount;
             let cost = answer.price;
             let item = answer.product;
             console.log(colors.grey("----------------------------------------------------------------------"));
 
+            // CONNECTS TO DATABASE AND INSERTS NEW PRODUCT OBJECT //
             var queryString = "INSERT INTO products SET ?";
             connection.query(queryString, {
                 Product_Name: answer.product,
@@ -218,10 +258,14 @@ function addProduct() {
                 Purchase_Price: cost,
                 Stock_Quantity: stock || 0
             },
+
+                // ALERTS MANAGER IF THERE WAS AN ERROR OR IF THE PRODUCT WAS ADDED TO THE INVENTORY //
                 function (err) {
                     if (err) throw err;
                     console.log(colors.magenta("Your new product " + item + " has been added to the inventory!"));
                     console.log(colors.grey("----------------------------------------------------------------------"));
+
+                    // PROMPTS MANAGER SELECTION //
                     runInquirer();
                 }
             );

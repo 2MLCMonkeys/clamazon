@@ -21,7 +21,7 @@ var connection = mySQL.createConnection({
     pager: "less -SFX"
 });
 
-// INTIAL DATABASE CONNECTION //
+// INITIAL DATABASE CONNECTION //
 connection.connect(function (err) {
     if (err) throw err;
 
@@ -31,7 +31,7 @@ connection.connect(function (err) {
 
 
 
-// INQUIER //
+// INQUIrER //
 function runInquirer() {
     inquirer
 

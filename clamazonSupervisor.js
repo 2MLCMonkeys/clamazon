@@ -96,4 +96,39 @@ function createDept() {
         }).catch(function (error) {
             console.log(error);
         })
-}
+};
+
+// function that joins the products and departments tables to produce a combined view - includes aliases to display calculated values
+function viewSales() {
+    connection.query("SELECT departments.Department_ID,departments.Department_Name,SUM(departments.Over_Head_Costs) AS Total_Costs,SUM(products.Product_Sales) AS Total_Sales,(SUM(products.Product_Sales)-SUM(departments.Over_Head_Costs)) AS Total_Profit FROM departments LEFT JOIN products ON departments.Department_Name = products.Department_Name GROUP BY Department_ID",
+
+        // CREATES TABLE FOR DEPARTMENT SALES //
+        function (err, res) {
+            if (err) throw err;
+            var table = new Table({
+                chars: {
+                    'top': '═', 'top-mid': '╤', 'top-left': '╔', 'top-right': '╗'
+                    , 'bottom': '═', 'bottom-mid': '╧', 'bottom-left': '╚', 'bottom-right': '╝'
+                    , 'left': '║', 'left-mid': '╟', 'mid': '─', 'mid-mid': '┼'
+                    , 'right': '║', 'right-mid': '╢', 'middle': '│'
+                }
+            });
+
+            // SPECIFIES WHERE DATA FROM DATABASE IS PLACED IN TABLE //
+            table.push(
+                [colors.cyan('Department ID#'), colors.cyan('Department Name'), colors.cyan('Overhead Costs'), colors.cyan('Product Sales'), colors.cyan("Total Profit")]
+            );
+
+            // ITERATES THROUGH ALL ITEMS AND FILLS TABLE WITH ALL RELEVANT INFORMATION FROM DATABASE //
+            for (var i = 0; i < res.length; i++) {
+                table.push(
+                    [colors.cyan(res[i].Department_ID), res[i].Department_Name, "$" + res[i].Total_Costs, '$' + res[i].Total_Sales, "$" + res[i].Total_Profit]
+                );
+                }
+                console.log(table.toString());
+                console.log(colors.grey("----------------------------------------------------------------------"));
+    
+                // PROMPTS WITH SUPERVISOR SELECTION //
+                runInquirer();
+            })
+};

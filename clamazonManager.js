@@ -31,7 +31,7 @@ connection.connect(function (err) {
 
 
 
-// INQUIrER //
+// INQUIRER //
 function runInquirer() {
     inquirer
 

@@ -32,10 +32,10 @@ The second scenario is as a manager interaction. It starts off with a selection 
 ![Manager](/public/assets/images/manager.png)
 
 #### Manager List of Products
-![Product List](/public/assets/images/manager3.png)
+![Manager Product List](/public/assets/images/manger3.png)
 
 #### Manager Low Inventory/Add to Current Inventory/Add a New Product
-![Product List](/public/assets/images/manager2.png)
+![Manager Tasks](/public/assets/images/manager2.png)
 
 
 

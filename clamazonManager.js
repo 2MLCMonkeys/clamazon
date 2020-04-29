@@ -256,7 +256,8 @@ function addProduct() {
                 Product_Name: answer.product,
                 Department_Name: answer.department,
                 Purchase_Price: cost,
-                Stock_Quantity: stock || 0
+                Stock_Quantity: stock || 0,
+                Product_Sales: 0.00
             },
 
                 // ALERTS MANAGER IF THERE WAS AN ERROR OR IF THE PRODUCT WAS ADDED TO THE INVENTORY //

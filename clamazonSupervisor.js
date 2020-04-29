@@ -112,7 +112,7 @@ function viewSales() {
                     , 'left': '║', 'left-mid': '╟', 'mid': '─', 'mid-mid': '┼'
                     , 'right': '║', 'right-mid': '╢', 'middle': '│'
                 }
-            });
+            });  
 
             // SPECIFIES WHERE DATA FROM DATABASE IS PLACED IN TABLE //
             table.push(
@@ -121,8 +121,23 @@ function viewSales() {
 
             // ITERATES THROUGH ALL ITEMS AND FILLS TABLE WITH ALL RELEVANT INFORMATION FROM DATABASE //
             for (var i = 0; i < res.length; i++) {
+                let tSales = res[i].Total_Sales;
+                let pSales = res[i].Total_Profit;
+    
+                function validateT (amt){
+                if (amt === null){
+                    return 0.00;
+                } else return amt;
+            };   
+    
+                function validateP (amt){
+                if (amt === null){
+                    return 0.00;
+                } else return amt;
+            }; 
+
                 table.push(
-                    [colors.cyan(res[i].Department_ID), res[i].Department_Name, "$" + res[i].Total_Costs, '$' + res[i].Total_Sales, "$" + res[i].Total_Profit]
+                    [colors.cyan(res[i].Department_ID), res[i].Department_Name, "$" + res[i].Total_Costs, '$' + validateT(tSales), "$" + validateP(pSales)]
                 );
                 }
                 console.log(table.toString());

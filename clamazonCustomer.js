@@ -1,14 +1,17 @@
-//cached password
+// DENPENDENCIES //
 require("dotenv").config();
-//global required node modules
+
+// GLOBAL REQUIRED NODE MODULES //
 let inquirer = require('inquirer');
 let mySQL = require("mysql");
 let keys = require("./keys.js");
 let colors = require('colors/safe');
 let Table = require('cli-table');
-//variable for password
+
+// PASSWORD VARIABLE //
 let MySQL = (keys.MySQL.password);
-//connection to MySQL database
+
+// CONNECTION TO MYSQL DATABASE //
 var connection = mySQL.createConnection({
     host: "localhost",
     port: 3306,
@@ -18,37 +21,48 @@ var connection = mySQL.createConnection({
     pager: "less -SFX"
 });
 
-//intial connection function and displays table of entire table in database called. 
-connection.connect(function(err){
-    if(err) throw err;
+// INITIAL DATABASE CONNECTION //
+connection.connect(function (err) {
+    if (err) throw err;
+
+    // QUERIES DATABASE FOR ALL PRODUCT INFORMATION //
     connection.query("SELECT Item_ID, Product_Name, Department_Name, Purchase_Price FROM products", function start(err, res, fields) {
         if (err) throw err;
-        //creates cl-table
+        // CREATES TABLE FOR PRODUCTS //
         var table = new Table({
-            chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' , 'top-right': '╗'
-                   , 'bottom': '═' , 'bottom-mid': '╧' , 'bottom-left': '╚' , 'bottom-right': '╝'
-                   , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
-                   , 'right': '║' , 'right-mid': '╢' , 'middle': '│' }
-          });
-          table.push(
-              [colors.cyan('Item ID#'), colors.cyan('Product Name'), colors.cyan('Department'), colors.cyan('Price')]
-          );
-           //pushes each item to table 
-          for (var i = 0; i < res.length; i++) {            
-              table.push(
-                  [colors.cyan(res[i].Item_ID), res[i].Product_Name, res[i].Department_Name, '$' +res[i].Purchase_Price]
-                  );
+            chars: {
+                'top': '═', 'top-mid': '╤', 'top-left': '╔', 'top-right': '╗'
+                , 'bottom': '═', 'bottom-mid': '╧', 'bottom-left': '╚', 'bottom-right': '╝'
+                , 'left': '║', 'left-mid': '╟', 'mid': '─', 'mid-mid': '┼'
+                , 'right': '║', 'right-mid': '╢', 'middle': '│'
+            }
+        });
+
+        // SPECIFIES WHERE DATA FROM DATABASE IS PLACE IN THE TABLE //
+        table.push(
+            [colors.cyan('Item ID#'), colors.cyan('Product Name'), colors.cyan('Department'), colors.cyan('Price')]
+        );
+
+        // ITERATES THROUGH ALL ITEMS AND FILLS TABLE WITH ALL RELEVANT INFORMATION FROM DATABASE //
+        for (var i = 0; i < res.length; i++) {
+            table.push(
+                [colors.cyan(res[i].Item_ID), res[i].Product_Name, res[i].Department_Name, '$' + res[i].Purchase_Price]
+            );
         }
         console.log(table.toString());
         console.log(colors.grey("----------------------------------------------------------------------"));
+
+        // PROMPTS CUSTOMER PRODUCT SELECTION // 
         runInquirer();
     });
 });
 
 
-//intial inquirer to pick an id in the above table and runs next inquirer to purchase product picked
+// INITIAL INQUIERER TO PICK INDIVIDUAL PRODUCT FROM THE DATABASE //
 function runInquirer() {
     inquirer
+
+        // SELECTS PRODUCT BY ID //
         .prompt([{
             name: "product",
             type: "input",
@@ -57,8 +71,11 @@ function runInquirer() {
         ]).then(function (res) {
             console.log(colors.grey("----------------------------------------------------------------------"));
             let input = res.product;
+
+            // RUNS FUNCTION TO PURCHASE CHOSEN PRODUCT //
             purchaseProduct(input);
-            //if no input into inquirer it will ask again
+
+            // IF NOT INPUT WILL PROMPT AGAIN //
             if (!input) {
                 console.log("Please enter an ID");
                 runInquirer();
@@ -67,14 +84,19 @@ function runInquirer() {
         });
 }
 
+// PURCHASE PRODUCT //
 function purchaseProduct(input) {
-    //connection to database pulling back specific item user would like and displays
+
+    // CONNECTION TO DATABASE USING CUSTOMER SELECTION TO FIND RELEVANT PRODUCT DATA //
     connection.query("SELECT * FROM products WHERE Item_ID LIKE ?", [input],
         function (err, res) {
             if (err) throw err;
+
+            // DISPLAYS PRODUCT FOR CUSTOMER //
             console.log(colors.magenta("Your Selction: ") + colors.cyan("ID#: ") + res[0].Item_ID + colors.cyan(" | Product: ") + res[0].Product_Name + colors.cyan(" | Department: ") + res[0].Department_Name + colors.cyan(" | Price: ") + res[0].Purchase_Price);
             console.log(colors.grey("----------------------------------------------------------------------"));
-            //inquirer run to ask how many the user would like to purchase
+            
+            // PROMPT FOR HOW MANY PRODUCTS BEING PURCHASED //
             function purchaseInquirer() {
                 let quantity = res[0].Stock_Quantity;
                 let ID = res[0].Item_ID;
@@ -88,14 +110,16 @@ function purchaseProduct(input) {
                         console.log(colors.grey("----------------------------------------------------------------------"));
                         let selection = res.purchase;
                         let cost = price * selection
-                        //checks quantity against how many the user would like and returns insufficient if not enough
+
+                        // CHECKS QUANITITY TO STOCK AMOUNT, RETURNS INSUFFICIENT IF LESS THAN DESIRED AMOUNT //
                         if (quantity < selection) {
                             console.log(colors.green("Insufficient quantity!"));
                             purchaseInquirer();
                         }
                         else if (selection < quantity) {
                             let difference = quantity - selection;
-                            //updates database with removed purchased product
+                            
+                            // UPDATES DATABASE REMOVING AMOUNT OF PRODUCTS PURCHASED BY CUSTOMER //
                             connection.query("UPDATE products SET ? WHERE ?",
                                 [{
                                     Stock_Quantity: difference
@@ -105,17 +129,21 @@ function purchaseProduct(input) {
                                 }],
                                 function (error) {
                                     if (error) throw err;
-                                    console.log(colors.magenta("Purchased successfully, your purchase cost: ") +colors.green("$" + cost));
+                                    console.log(colors.magenta("Purchased successfully, your purchase cost: ") + colors.green("$" + cost));
                                     connection.end();
                                 })
                         }
                         else if (selection === "E" || selection === "e") {
+
+                            // TABLE DISPLAYED WITH ALL PRODUCTS AND PROMPTS FOR ID SELECTION AGAIN //
                             runInquirer();
                         }
 
 
                     })
             };
+
+            // RUNS PURCHASE FUNCTION //
             purchaseInquirer();
         })
 };

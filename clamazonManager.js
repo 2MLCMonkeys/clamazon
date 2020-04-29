@@ -1,13 +1,17 @@
+// DEPENDENCIES //
 require("dotenv").config();
 
+// GLOBAL REQUIRED NODE MODULES //
 let inquirer = require('inquirer');
 let mySQL = require("mysql");
 let keys = require("./keys.js");
 let colors = require('colors/safe');
 let Table = require('cli-table');
 
+// PASSWORD VARIABLE //
 let MySQL = (keys.MySQL.password);
 
+// CONNECTION TO MYSQL DATABASE //
 var connection = mySQL.createConnection({
     host: "localhost",
     port: 3306,
@@ -17,29 +21,31 @@ var connection = mySQL.createConnection({
     pager: "less -SFX"
 });
 
-
+// INTIAL DATABASE CONNECTION //
 connection.connect(function (err) {
     if (err) throw err;
+    // STARTS INQUIRER //
     runInquirer();
 });
 
 
 
-
+// INQUIER //
 function runInquirer() {
     inquirer
+        // SELECTION FOR MANAGER //
         .prompt([{
             name: "menu",
             type: "list",
             message: "What would you like to do?:",
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "Quit"]
         }
+            // SENDS SELECTION TO CORRECT FUNCTION //
         ]).then(function (res) {
             console.log(colors.grey("----------------------------------------------------------------------"));
             let input = res.menu;
             if (input === "View Products for Sale") {
                 viewProducts();
-
             }
             else if (input === "View Low Inventory") {
                 checkInventory();
@@ -50,7 +56,7 @@ function runInquirer() {
             else if (input === "Add New Product") {
                 addProduct();
             }
-            else if (input === "Quit"){
+            else if (input === "Quit") {
                 connection.end();
             }
             else if (!input) {
@@ -61,9 +67,10 @@ function runInquirer() {
         });
 };
 
-
+// VIEWS ALL INVENTORY //
 function viewProducts() {
     connection.query("SELECT * FROM products",
+        // CREATES TABLE FOR PRODUCTS //
         function start(err, res, fields) {
             if (err) throw err;
             var table = new Table({
@@ -74,10 +81,11 @@ function viewProducts() {
                     , 'right': '║', 'right-mid': '╢', 'middle': '│'
                 }
             });
+            // SPECIFIES WHERE DATA FROM DATABASE IS PLACED IN TABLE //
             table.push(
                 [colors.cyan('Item ID#'), colors.cyan('Product Name'), colors.cyan('Department'), colors.cyan('Price'), colors.cyan("Stock Quantity")]
             );
-
+            // ITERATES THROUGH ALL ITEMS AND FILLS TABLE WITH ALL RELEVANT INFORMATION FROM DATABASE //
             for (var i = 0; i < res.length; i++) {
 
                 table.push(
@@ -86,6 +94,7 @@ function viewProducts() {
             }
             console.log(table.toString());
             console.log(colors.grey("----------------------------------------------------------------------"));
+            // PROMPTS WITH MANAGER SELECTION //
             runInquirer();
         })
 };
@@ -216,6 +225,6 @@ function addProduct() {
                     runInquirer();
                 }
             );
-            });
+        });
 
 };

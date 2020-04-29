@@ -1,7 +1,4 @@
 USE mysql;
-
-drop database if exists clamazon_db;
-create database clamazon_db;
 use clamazon_db;
 
 create table products(

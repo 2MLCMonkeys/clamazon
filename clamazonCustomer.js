@@ -101,6 +101,7 @@ function purchaseProduct(input) {
                 let quantity = res[0].Stock_Quantity;
                 let ID = res[0].Item_ID;
                 let price = res[0].Purchase_Price;
+                let sales = res[0].Product_Sales;
                 inquirer
                     .prompt([{
                         name: "purchase",
@@ -118,6 +119,8 @@ function purchaseProduct(input) {
                         }
                         else if (selection < quantity) {
                             let difference = quantity - selection;
+                            let profit = sales + cost;
+                            console.log("Profit" + profit);
                             
                             // UPDATES DATABASE REMOVING AMOUNT OF PRODUCTS PURCHASED BY CUSTOMER //
                             connection.query("UPDATE products SET ? WHERE ?",
@@ -130,6 +133,7 @@ function purchaseProduct(input) {
                                 function (error) {
                                     if (error) throw err;
                                     console.log(colors.magenta("Purchased successfully, your purchase cost: ") + colors.green("$" + cost));
+                                    updateProfit(profit, ID);
                                     connection.end();
                                 })
                         }
@@ -147,3 +151,10 @@ function purchaseProduct(input) {
             purchaseInquirer();
         })
 };
+
+// UPDATES THE PROFIT MARGIN ON PRODUCT //
+function updateProfit(profit, ID){
+    connection.query(`UPDATE products SET Product_Sales = ${profit} WHERE item_id=?`, [ID], function (error, res) {
+        if (error) throw error;
+      })
+    };

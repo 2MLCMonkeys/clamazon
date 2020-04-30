@@ -10,7 +10,7 @@ The third scenario is as a supervisor interaction. It starts off with a selectio
 </p>
 
 ## Application 
-[VIDEO EXAMPLE OF APPLICATION CUSTOMER AND MANAGER](https://drive.google.com/file/d/1FbdJSy_g4fRV3lC36x1n-R39hHO8BFxb/view)
+[VIDEO EXAMPLE OF APPLICATION CUSTOMER AND MANAGER](https://drive.google.com/file/d/1FbdJSy_g4fRV3lC36x1n-R39hHO8BFxb/view)<br>
 [VIDEO EXAMPLE OF APPLICATION SUPERVISOR](https://drive.google.com/file/d/11w76z2xFguYw3vfBaJKv1iXxdFD5L-N3/view)
 
 ## App Incorporation

@@ -46,27 +46,24 @@ function runInquirer() {
             // SENDS SELECTION TO CORRECT FUNCTION //
         ]).then(function (res) {
             console.log(colors.grey("----------------------------------------------------------------------"));
-            let input = res.menu;
-            if (input === "View Products for Sale") {
-                viewProducts();
+            switch (res.menu) {
+                case "View Products for Sale":
+                    viewProducts();
+                    break;
+                case "View Low Inventory":
+                    checkInventory();
+                    break;
+                case "Add to Inventory":
+                    addInventory();
+                    break;
+                case "Add New Product":
+                    addProduct();
+                    break;
+                case "Quit":
+                    console.log("Have a nice day!");
+                    connection.end();
+                    break;
             }
-            else if (input === "View Low Inventory") {
-                checkInventory();
-            }
-            else if (input === "Add to Inventory") {
-                addInventory();
-            }
-            else if (input === "Add New Product") {
-                addProduct();
-            }
-            else if (input === "Quit") {
-                connection.end();
-            }
-            else if (!input) {
-                console.log("Please enter an ID");
-                runInquirer();
-            }
-
         });
 };
 
@@ -125,7 +122,7 @@ function checkInventory() {
         table.push(
             [colors.cyan('Item ID#'), colors.cyan('Product Name'), colors.cyan('Department'), colors.cyan('Price'), colors.cyan('Stock Quantity')]
         );
-        
+
         // ITERATES THROUGH ALL ITEMS AND FILLS TABLE WITH ALL RELEVANT INFORMATION FROM DATABASE IF INVENTORY IS LESS THAN 5 IT WILL BE DISPLAYED ON TABLE//
         for (var i = 0; i < res.length; i++) {
             table.push(
@@ -218,7 +215,7 @@ function addProduct() {
             name: "amount",
             type: "input",
             message: "How many products are you adding to the inventory?",
-            
+
             // VALIDATES ITS A TRUE AMOUNT //
             validate: function (amount) {
                 if (isNaN(amount) === false) {
@@ -243,7 +240,7 @@ function addProduct() {
             }
         }
 
-        // CREATES OBJECT FROM INQUIERER TO BE PLACED IN DATABASE //
+            // CREATES OBJECT FROM INQUIERER TO BE PLACED IN DATABASE //
         ]).then(function (answer) {
             let stock = answer.amount;
             let cost = answer.price;

@@ -57,7 +57,7 @@ function runInquirer() {
         })
 }
 
-// function to add a new department
+// ADDING NEW DEPARTMENT PROMPT //
 function createDept() {
     inquirer
         .prompt([
@@ -84,6 +84,8 @@ function createDept() {
                 }
             },
         ]).then(function (ans) {
+
+            // CONNECTION TO DATABASE INSERTING NEW DEPARTMENT //
             connection.query("INSERT INTO departments SET ?",
                 {
                     department_name: ans.newDept,
@@ -98,7 +100,7 @@ function createDept() {
         })
 };
 
-// function that joins the products and departments tables to produce a combined view - includes aliases to display calculated values
+// FUNCTION TO DISPLAY SALES (JOINS TABLES AND ALIASES TO DISPLAY CALCULATED VALUES) //
 function viewSales() {
     connection.query("SELECT departments.Department_ID,departments.Department_Name,SUM(departments.Over_Head_Costs) AS Total_Costs,SUM(products.Product_Sales) AS Total_Sales,(SUM(products.Product_Sales)-SUM(departments.Over_Head_Costs)) AS Total_Profit FROM departments LEFT JOIN products ON departments.Department_Name = products.Department_Name GROUP BY Department_ID",
 
@@ -121,15 +123,19 @@ function viewSales() {
 
             // ITERATES THROUGH ALL ITEMS AND FILLS TABLE WITH ALL RELEVANT INFORMATION FROM DATABASE //
             for (var i = 0; i < res.length; i++) {
+
+                // SETTING UP FUNCTIONS TO PREVENTS DATA BEING DISPLAYED AS NULL //
                 let tSales = res[i].Total_Sales;
                 let pSales = res[i].Total_Profit;
-    
+                
+                // VALIDATES TOTAL SALES //
                 function validateT (amt){
                 if (amt === null){
                     return 0.00;
                 } else return amt;
             };   
-    
+
+                // VALIDATES PRODUCT SALES //
                 function validateP (amt){
                 if (amt === null){
                     return 0.00;

@@ -193,80 +193,91 @@ function addInventory() {
 
 // ADDING NEW PRODUCT TO DATABASE //
 function addProduct() {
-    inquirer
+    connection.query("SELECT * FROM departments", function start(err, res, fields) {
+        if (err) throw err;
 
-        // NAME OF NEW PRODUCT //
-        .prompt([{
-            name: "product",
-            type: "input",
-            message: "What is the name of the new product being added?"
-        },
+        // INQUIRER FOR ADDING NEW PRODUCT
+        inquirer
 
-        // WHICH CURRENT DEPARTMENT NEW PRODUCT BELONGS TO //
-        {
-            name: "department",
-            type: "list",
-            message: "Which department would you like to add your product to?",
-            choices: ["Decor", "Baby", "Home and Garden", "Beauty and Health", "Clothing", "Pets", "Electronics"]
-        },
-
-        // PRODUCT INVENTORY TO BE ADDED //
-        {
-            name: "amount",
-            type: "input",
-            message: "How many products are you adding to the inventory?",
-
-            // VALIDATES ITS A TRUE AMOUNT //
-            validate: function (amount) {
-                if (isNaN(amount) === false) {
-                    return true;
-                }
-                return false;
-            }
-        },
-
-        // COST OF NEW PRODUCT //
-        {
-            name: "price",
-            type: "input",
-            message: "What is the cost of the new inventory?",
-
-            // VALIDATES ITS A TRUE AMOUNT //
-            validate: function (price) {
-                if (isNaN(price) === false) {
-                    return true;
-                }
-                return false;
-            }
-        }
-
-            // CREATES OBJECT FROM INQUIERER TO BE PLACED IN DATABASE //
-        ]).then(function (answer) {
-            let stock = answer.amount;
-            let cost = answer.price;
-            let item = answer.product;
-            console.log(colors.grey("----------------------------------------------------------------------"));
-
-            // CONNECTS TO DATABASE AND INSERTS NEW PRODUCT OBJECT //
-            var queryString = "INSERT INTO products SET ?";
-            connection.query(queryString, {
-                Product_Name: answer.product,
-                Department_Name: answer.department,
-                Purchase_Price: cost,
-                Stock_Quantity: stock || 0,
-                Product_Sales: 0.00
+            // NAME OF NEW PRODUCT //
+            .prompt([{
+                name: "product",
+                type: "input",
+                message: "What is the name of the new product being added?"
             },
 
-                // ALERTS MANAGER IF THERE WAS AN ERROR OR IF THE PRODUCT WAS ADDED TO THE INVENTORY //
-                function (err) {
-                    if (err) throw err;
-                    console.log(colors.magenta("Your new product " + item + " has been added to the inventory!"));
-                    console.log(colors.grey("----------------------------------------------------------------------"));
-
-                    // PROMPTS MANAGER SELECTION //
-                    runInquirer();
+            // WHICH CURRENT DEPARTMENT NEW PRODUCT BELONGS TO //
+            {
+                name: "department",
+                type: "list",
+                message: "Which department would you like to add your product to?",
+                choices: function () {
+                    var departmentArray = [];
+                    for (var x = 0; x < res.length; x++) {
+                        departmentArray.push(res[x].Department_Name);
+                    }
+                    return departmentArray;
                 }
-            );
-        });
+            },
 
-};
+            // PRODUCT INVENTORY TO BE ADDED //
+            {
+                name: "amount",
+                type: "input",
+                message: "How many products are you adding to the inventory?",
+
+                // VALIDATES ITS A TRUE AMOUNT //
+                validate: function (amount) {
+                    if (isNaN(amount) === false) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+
+            // COST OF NEW PRODUCT //
+            {
+                name: "price",
+                type: "input",
+                message: "What is the cost of the new inventory?",
+
+                // VALIDATES ITS A TRUE AMOUNT //
+                validate: function (price) {
+                    if (isNaN(price) === false) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+
+                // CREATES OBJECT FROM INQUIERER TO BE PLACED IN DATABASE //
+            ]).then(function (answer) {
+                let stock = answer.amount;
+                let cost = answer.price;
+                let item = answer.product;
+                console.log(colors.grey("----------------------------------------------------------------------"));
+
+                // CONNECTS TO DATABASE AND INSERTS NEW PRODUCT OBJECT //
+                var queryString = "INSERT INTO products SET ?";
+                connection.query(queryString, {
+                    Product_Name: answer.product,
+                    Department_Name: answer.department,
+                    Purchase_Price: cost,
+                    Stock_Quantity: stock || 0,
+                    Product_Sales: 0.00
+                },
+
+                    // ALERTS MANAGER IF THERE WAS AN ERROR OR IF THE PRODUCT WAS ADDED TO THE INVENTORY //
+                    function (err) {
+                        if (err) throw err;
+                        console.log(colors.magenta("Your new product " + item + " has been added to the inventory!"));
+                        console.log(colors.grey("----------------------------------------------------------------------"));
+
+                        // PROMPTS MANAGER SELECTION //
+                        runInquirer();
+                    }
+                );
+            });
+
+    });
+}
